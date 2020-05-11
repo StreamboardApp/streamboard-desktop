@@ -34,5 +34,9 @@ export default {
 
   #app {
     height: 100%;
+
+    .vm--overlay {
+      background: rgba($color: #000000, $alpha: 0.5);
+    }
   }
 </style>

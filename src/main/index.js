@@ -7,6 +7,7 @@ import { PluginManager } from 'live-plugin-manager'
 import path from 'path'
 import ActionsService from './actions'
 import StreamboardServer from './server'
+import assert from 'assert'
 
 /**
  * Set `__static` path to static files in production
@@ -49,6 +50,14 @@ function createWindow () {
       label: 'Application',
       submenu: [
         {
+          label: 'Preferences',
+          click () {
+            mainWindow.webContents.send('application', {
+              event: 'OPEN_PREFERENCES'
+            })
+          }
+        },
+        {
           label: 'Connect phone',
           click () {
             mainWindow.webContents.send('application', {
@@ -56,6 +65,7 @@ function createWindow () {
             })
           }
         },
+        { type: 'separator' },
         {
           label: 'Exit',
           click () {
@@ -238,6 +248,7 @@ ipcMain.on('ready', () => {
 
     store.dispatch('application/SET_FIRST_RUN', false)
 
+    // Temporary development setup
     store.dispatch('application/SET_PLUGINS', [
       {
         type: 'local',
@@ -247,26 +258,36 @@ ipcMain.on('ready', () => {
   }
 
   store.state.application.plugins.forEach(async pluginInfo => {
-    switch (pluginInfo.type) {
-    case 'local': {
-      console.log('Loading plugin', pluginInfo.package)
-      try {
-        const info = await manager.installFromPath(pluginInfo.package, {
-          force: true
-        })
-        const plugin = manager.require(info.name)
-        // TODO: Sanity check the plugin
-        actions.registerActions(plugin.namespace, plugin.actions)
-      } catch (err) {
-        console.log('Failed to load plugin', pluginInfo.package, err)
-      }
-      break
-    }
-    }
+    loadPlugin(pluginInfo)
   })
   
   server.start()
 })
+
+async function loadPlugin(pluginInfo) {
+  switch (pluginInfo.type) {
+  case 'local': {
+    console.log('Loading plugin', pluginInfo.package)
+    try {
+      const info = await manager.installFromPath(pluginInfo.package, {
+        force: true
+      })
+      const plugin = manager.require(info.name)
+      assert.equal(plugin !== null && typeof plugin === 'object' && !Array.isArray(plugin), true, `Plugin ${info.name} is not an object`)
+      assert.equal(typeof plugin.namespace === 'string', true, `Plugin ${info.name} namespace is not a string`)
+      assert.equal(typeof plugin.apiVersion === 'number' && !isNaN(plugin.apiVersion), true, `Plugin ${info.name} apiVersion is not a number`)
+      assert.equal(Array.isArray(plugin.actions), true, `Plugin ${info.name} actions is not an array`)
+      assert.equal(plugin.apiVersion <= 1 && plugin.apiVersion > 0, true, `Plugin ${info.name} does not have a supported API version. Plugin is using API version ${plugin.apiVersion} while we only support versions <= 1`)
+
+      actions.registerActions(plugin.namespace, plugin.actions)
+      console.log('Loaded plugin', pluginInfo.package)
+    } catch (err) {
+      console.log('Failed to load plugin', pluginInfo.package, err)
+    }
+    break
+  }
+  }
+}
 
 ipcMain.on('button', async (event, message) => {
   switch (message.event) {
@@ -302,6 +323,38 @@ ipcMain.on('actions', async (event, message) => {
       action: message.data.action,
       namespace: message.data.namespace,
       schema
+    })
+    break
+  }
+  }
+})
+
+ipcMain.on('application', async (event, message) => {
+  switch (message.event) {
+  case 'GET_PLUGINS': {
+    var plugins = await manager.list()
+    event.sender.send('plugins', {
+      plugins
+    })
+    break
+  }
+  case 'ADD_PLUGIN': {
+    await loadPlugin({
+      type: 'local',
+      package: message.data.package
+    })
+    var newPlugins = await manager.list()
+    event.sender.send('plugins', {
+      plugins: newPlugins
+    })
+    break
+  }
+  case 'REMOVE_PLUGIN': {
+    const plugin = manager.require(message.data.name)
+    actions.unregisterActions(plugin.namespace)
+    await manager.uninstall(message.data.name)
+    event.sender.send('plugins', {
+      plugins
     })
     break
   }

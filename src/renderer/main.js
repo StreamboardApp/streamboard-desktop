@@ -10,6 +10,7 @@ import { ipcRenderer } from 'electron'
 
 import VModal from 'vue-js-modal'
 import ConnectModal from '@/components/ConnectModal.vue'
+import PreferencesModal from '@/components/PreferencesModal.vue'
 
 if (!process.env.IS_WEB) Vue.use(require('vue-electron'))
 Vue.http = Vue.prototype.$http = axios
@@ -47,11 +48,22 @@ ipcRenderer.on('button', (_, message) => {
 })
 
 ipcRenderer.on('application', (_, message) => {
-  if (message.event === 'CONNECT_PHONE') {
+  switch (message.event) {
+  case 'CONNECT_PHONE': {
     app.$modal.show(ConnectModal, {}, {
       scrollable: true,
-      styles: 'background-color: #121212;',
+      styles: 'background-color: #212121;',
       height: 'auto'
     })
+    break
+  }
+  case 'OPEN_PREFERENCES': {
+    app.$modal.show(PreferencesModal, {}, {
+      scrollable: false,
+      styles: 'background-color: #212121;',
+      height: 'auto'
+    })
+    break
+  }
   }
 })

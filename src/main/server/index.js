@@ -13,6 +13,8 @@ export default class StreamboardServer {
   }
 
   start () {
+    if (this.ws) { return }
+      
     this.ws = new WebSocketServer({ port: 6840 })
 
     this.ws.on('connection', (ws) => {

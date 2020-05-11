@@ -1,3 +1,5 @@
+import assert from 'assert'
+
 var store
 
 export default class ActionsService {
@@ -13,6 +15,16 @@ export default class ActionsService {
         throw new Error(`Cannot register actions for ${namespace} as it already exists`)
       }
     }
+
+    assert.equal(typeof namespace === 'string', true, `${namespace} is not a string`)
+    actions.forEach(action => {
+      assert.equal(action !== null && typeof action === 'object' && !Array.isArray(action), true, `${namespace} has an invalid action`)
+      assert.equal(typeof action.id === 'string', true, `${namespace} has an action with an invalid \`id\`, expected string`)
+      assert.equal(typeof action.label === 'string', true, `${namespace} has an action with an invalid \`label\`, expected string`)
+      assert.equal(typeof action.getConfigSchema === 'function', true, `${namespace} has an action with an invalid \`getConfigSchema\`, expected function`)
+      assert.equal(typeof action.execute === 'function', true, `${namespace} has an action with an invalid \`execute\`, expected a function`)
+      console.log(`Registering action ${action.id} in ${namespace}`)
+    });
 
     this.actions[namespace] = actions
     store.dispatch('application/SET_ACTIONS', Object.entries(this.actions))
@@ -44,9 +56,9 @@ export default class ActionsService {
         if (action.id === actionId) {
           const result = action.getConfigSchema()
           Promise.resolve(result).then((value) => {
-            console.log(value)
             resolve(value)
-          }).catch(() => {
+          }).catch((err) => {
+            console.log(err)
             reject()
           })
         }
