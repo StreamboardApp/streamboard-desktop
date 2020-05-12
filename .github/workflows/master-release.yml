@@ -24,7 +24,7 @@ jobs:
       uses: actions/setup-node@v1
       with:
         node-version: ${{ matrix.node-version }}
-    - run: npm ci
+    - run: yarn install --frozen-lockfile
     - name: Electron Builder Action
       uses: samuelmeuli/action-electron-builder@v1.4.0
       with:
