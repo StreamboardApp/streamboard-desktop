@@ -59,7 +59,7 @@ ipcRenderer.on('application', (_, message) => {
   }
   case 'OPEN_PREFERENCES': {
     app.$modal.show(PreferencesModal, {}, {
-      scrollable: false,
+      scrollable: true,
       styles: 'background-color: #212121;',
       height: 'auto'
     })

@@ -94,7 +94,6 @@ export default {
       })
     },
     executeButton (row, column) {
-      console.log('Executing button at', row, column)
       this.$electron.ipcRenderer.send('button', {
         event: 'EXECUTE',
         data: {

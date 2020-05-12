@@ -32,6 +32,7 @@ export default class ActionsService {
 
   unregisterActions (namespace) {
     delete this.actions[namespace]
+    store.dispatch('application/SET_ACTIONS', Object.entries(this.actions))
   }
 
   execute (namespace, actionId, config) {
@@ -42,7 +43,7 @@ export default class ActionsService {
           Promise.resolve(result).then((value) => {
             resolve(value)
           }).catch((err) => {
-            console.log(err)
+            console.log("Error while executing action", err)
             reject()
           })
         }
@@ -58,7 +59,7 @@ export default class ActionsService {
           Promise.resolve(result).then((value) => {
             resolve(value)
           }).catch((err) => {
-            console.log(err)
+            console.log("Error while getting config schema", err)
             reject()
           })
         }

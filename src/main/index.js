@@ -156,38 +156,6 @@ ipcMain.on('ready', () => {
                 inactive: '',
                 active: ''
               }
-            }
-          ],
-          [
-            {
-              label: '',
-              action: '',
-              actionNamespace: '',
-              config: {},
-              icons: {
-                inactive: '',
-                active: ''
-              }
-            },
-            {
-              label: '',
-              action: '',
-              actionNamespace: '',
-              config: {},
-              icons: {
-                inactive: '',
-                active: ''
-              }
-            },
-            {
-              label: '',
-              action: '',
-              actionNamespace: '',
-              config: {},
-              icons: {
-                inactive: '',
-                active: ''
-              }
             },
             {
               label: '',
@@ -201,6 +169,68 @@ ipcMain.on('ready', () => {
             }
           ],
           [
+            {
+              label: '',
+              action: '',
+              actionNamespace: '',
+              config: {},
+              icons: {
+                inactive: '',
+                active: ''
+              }
+            },
+            {
+              label: '',
+              action: '',
+              actionNamespace: '',
+              config: {},
+              icons: {
+                inactive: '',
+                active: ''
+              }
+            },
+            {
+              label: '',
+              action: '',
+              actionNamespace: '',
+              config: {},
+              icons: {
+                inactive: '',
+                active: ''
+              }
+            },
+            {
+              label: '',
+              action: '',
+              actionNamespace: '',
+              config: {},
+              icons: {
+                inactive: '',
+                active: ''
+              }
+            },
+            {
+              label: '',
+              action: '',
+              actionNamespace: '',
+              config: {},
+              icons: {
+                inactive: '',
+                active: ''
+              }
+            }
+          ],
+          [
+            {
+              label: '',
+              action: '',
+              actionNamespace: '',
+              config: {},
+              icons: {
+                inactive: '',
+                active: ''
+              }
+            },
             {
               label: '',
               action: '',
@@ -330,9 +360,10 @@ ipcMain.on('actions', async (event, message) => {
 })
 
 ipcMain.on('application', async (event, message) => {
+  var plugins
   switch (message.event) {
   case 'GET_PLUGINS': {
-    var plugins = await manager.list()
+    plugins = await manager.list()
     event.sender.send('plugins', {
       plugins
     })
@@ -343,9 +374,9 @@ ipcMain.on('application', async (event, message) => {
       type: 'local',
       package: message.data.package
     })
-    var newPlugins = await manager.list()
+    plugins = await manager.list()
     event.sender.send('plugins', {
-      plugins: newPlugins
+      plugins
     })
     break
   }
@@ -353,6 +384,7 @@ ipcMain.on('application', async (event, message) => {
     const plugin = manager.require(message.data.name)
     actions.unregisterActions(plugin.namespace)
     await manager.uninstall(message.data.name)
+    plugins = await manager.list()
     event.sender.send('plugins', {
       plugins
     })
@@ -369,7 +401,7 @@ ipcMain.on('application', async (event, message) => {
  * https://simulatedgreg.gitbooks.io/electron-vue/content/en/using-electron-builder.html#auto-updating
  */
 
-/*
+
 import { autoUpdater } from 'electron-updater'
 
 autoUpdater.on('update-downloaded', () => {
@@ -379,4 +411,3 @@ autoUpdater.on('update-downloaded', () => {
 app.on('ready', () => {
   if (process.env.NODE_ENV === 'production') autoUpdater.checkForUpdates()
 })
- */
