@@ -141,6 +141,10 @@ export default {
 
         &.active {
           background-color: #FAFAFA;
+          
+          .default-icon {
+            color: #000000;
+          }
         }
 
         &:hover, &.hover {

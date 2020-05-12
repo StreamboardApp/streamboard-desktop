@@ -20,6 +20,7 @@
         <option v-for="(option, optionIndex) in inputSchema.values" :key="optionIndex" :value="option.value">{{ option.name }}</option>
       </select>
     </div>
+    <button class="delete" @click="deleteButtonAction()">Delete Action</button>
   </div>
 </template>
 
@@ -35,6 +36,17 @@ export default {
     column: Number
   },
   methods: {
+    deleteButtonAction () {
+      this.$store.dispatch('boards/SET_BUTTON_ACTION', {
+        row: this.row,
+        column: this.column,
+        actionNamespace: '',
+        action: '',
+        defaultIcons: { inactive: '', active: '' }
+      })
+
+      this.$emit('close')
+    },
     configChanged (event, id) {
       this.$store.dispatch('boards/SET_BUTTON_CONFIG', {
         row: this.row,
@@ -144,6 +156,19 @@ export default {
         background-color: #323232;
         color: #FAFAFA;
         border: unset;
+      }
+    }
+
+    .delete {
+      margin-top: 1rem;
+      padding: 0.75rem;
+      border: unset;
+      background-color: #F44336;
+      color: #FAFAFA;
+
+      &:hover {
+        cursor: pointer;
+        background-color: #D32F2F;
       }
     }
   }
