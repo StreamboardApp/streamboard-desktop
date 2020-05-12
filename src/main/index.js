@@ -8,6 +8,7 @@ import path from 'path'
 import ActionsService from './actions'
 import StreamboardServer from './server'
 import assert from 'assert'
+import open from 'open'
 
 /**
  * Set `__static` path to static files in production
@@ -78,10 +79,10 @@ function createWindow () {
       label: 'Help',
       submenu: [
         {
-          label: 'Report Bug'
-        },
-        {
-          label: 'About'
+          label: 'Report Bug',
+          click () {
+            open('https://github.com/StreamboardApp/streamboard-desktop/issues')
+          }
         }
       ]
     }
@@ -278,11 +279,11 @@ ipcMain.on('ready', () => {
 
     store.dispatch('application/SET_FIRST_RUN', false)
 
-    // Temporary development setup
+    // Default plugins
     store.dispatch('application/SET_PLUGINS', [
       {
-        type: 'local',
-        package: 'F:\\Streamboard\\streamboard-plugin-streamlabs'
+        type: 'github',
+        package: 'StreamboardApp/streamboard-plugin-streamlabs'
       }
     ])
   }
@@ -295,13 +296,29 @@ ipcMain.on('ready', () => {
 })
 
 async function loadPlugin(pluginInfo) {
+  console.log('Loading plugin', pluginInfo.package)
+
   switch (pluginInfo.type) {
   case 'local': {
-    console.log('Loading plugin', pluginInfo.package)
     try {
-      const info = await manager.installFromPath(pluginInfo.package, {
-        force: true
-      })
+      const info = await manager.installFromPath(pluginInfo.package)
+      const plugin = manager.require(info.name)
+      assert.equal(plugin !== null && typeof plugin === 'object' && !Array.isArray(plugin), true, `Plugin ${info.name} is not an object`)
+      assert.equal(typeof plugin.namespace === 'string', true, `Plugin ${info.name} namespace is not a string`)
+      assert.equal(typeof plugin.apiVersion === 'number' && !isNaN(plugin.apiVersion), true, `Plugin ${info.name} apiVersion is not a number`)
+      assert.equal(Array.isArray(plugin.actions), true, `Plugin ${info.name} actions is not an array`)
+      assert.equal(plugin.apiVersion <= 1 && plugin.apiVersion > 0, true, `Plugin ${info.name} does not have a supported API version. Plugin is using API version ${plugin.apiVersion} while we only support versions <= 1`)
+
+      actions.registerActions(plugin.namespace, plugin.actions)
+      console.log('Loaded plugin', pluginInfo.package)
+    } catch (err) {
+      console.log('Failed to load plugin', pluginInfo.package, err)
+    }
+    break
+  }
+  case 'github': {
+    try {
+      const info = await manager.installFromGithub(pluginInfo.package)
       const plugin = manager.require(info.name)
       assert.equal(plugin !== null && typeof plugin === 'object' && !Array.isArray(plugin), true, `Plugin ${info.name} is not an object`)
       assert.equal(typeof plugin.namespace === 'string', true, `Plugin ${info.name} namespace is not a string`)
@@ -371,7 +388,7 @@ ipcMain.on('application', async (event, message) => {
   }
   case 'ADD_PLUGIN': {
     await loadPlugin({
-      type: 'local',
+      type: 'github',
       package: message.data.package
     })
     plugins = await manager.list()
