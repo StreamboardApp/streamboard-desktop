@@ -33,4 +33,4 @@ jobs:
         # Whether the app should be released after a successful build
         release: false
         # Whether the action should execute the NPM build script before running `electron-builder`
-        skip_build: true
+        skip_build: false
