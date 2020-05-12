@@ -1,6 +1,8 @@
 <template>
   <div id="app">
-    <router-view></router-view>
+    <transition name="fade">
+      <router-view></router-view>
+    </transition>
   </div>
 </template>
 
@@ -38,5 +40,19 @@ export default {
     .vm--overlay {
       background: rgba($color: #000000, $alpha: 0.5);
     }
+  }
+
+  .fade-enter-active, .fade-leave-active {
+    transition-duration: 0.25s;
+    transition-property: opacity;
+    transition-timing-function: ease;
+  }
+
+  .fade-enter-active {
+    transition-delay: 0.25s;
+  }
+
+  .fade-enter, .fade-leave-active {
+    opacity: 0;
   }
 </style>

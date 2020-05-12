@@ -4,7 +4,7 @@
     <section v-for="(actionGroup, groupIndex) in this.$store.state.application.actions" :key="groupIndex">
       <h4 class="section-header">{{ actionGroup[0] }}</h4>
       <ul>
-        <li v-for="(action, actionIndex) in actionGroup[1]" :key="actionIndex" class="action" draggable="true" @dragstart="dragActionStart($event, actionGroup[0], action.id)">{{ action.label }}</li>
+        <li v-for="(action, actionIndex) in actionGroup[1]" :key="actionIndex" class="action" draggable="true" @dragstart="dragActionStart($event, actionGroup[0], action.id, action.defaultIcons)">{{ action.label }}</li>
       </ul>
     </section>
   </div>
@@ -14,12 +14,13 @@
 export default {
   name: 'actions',
   methods: {
-    dragActionStart (event, namespace, id) {
+    dragActionStart (event, namespace, id, defaultIcons) {
       event.dataTransfer.setData('application/json', JSON.stringify({
         type: 'ACTION',
         data: {
           namespace,
-          id
+          id,
+          defaultIcons
         }
       }))
     }

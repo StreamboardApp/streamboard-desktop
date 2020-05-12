@@ -5,6 +5,10 @@
         <button @click="configureButton(rowIndex, columnIndex)" @contextmenu="executeButton(rowIndex, columnIndex)" @dragstart="buttonDragStart($event, rowIndex, columnIndex)" @dragover="buttonDragOver($event)" @dragenter="buttonDragEnter($event, rowIndex, columnIndex)" @dragleave="buttonDragLeave($event)" @drop="buttonDragDrop($event, rowIndex, columnIndex)" :class="{ button: true, active: column.state }" >
           <img v-if="!column.state && column.icons.inactive.trim() !== ''" class="icon" :src="column.icons.inactive">
           <img v-if="column.state && column.icons.active.trim() !== ''" class="icon" :src="column.icons.active">
+
+          <fa-icon class="default-icon" v-if="!column.state && column.icons.inactive.trim() === '' && column.defaultIcons.inactive.trim() !== ''" :icon="column.defaultIcons.inactive.split(' ')" size="6x"></fa-icon>
+          <fa-icon class="default-icon" v-if="column.state && column.icons.active.trim() === '' && column.defaultIcons.active.trim() !== ''" :icon="column.defaultIcons.active.split(' ')" size="6x"></fa-icon>
+
           <p class="label">{{ column.label }}</p>
         </button>
       </div>
@@ -13,7 +17,7 @@
 </template>
 
 <script>
-import Modal from '@/components/Modal.vue'
+import ConfigModal from '@/components/ConfigModal.vue'
 
 export default {
   name: 'board',
@@ -48,7 +52,8 @@ export default {
           row,
           column,
           actionNamespace: json.data.namespace,
-          action: json.data.id
+          action: json.data.id,
+          defaultIcons: json.data.defaultIcons
         })
       } else if (json.type === 'BUTTON') {
         this.$store.dispatchPromise('boards/SWAP_BUTTONS', {
@@ -78,7 +83,7 @@ export default {
 
       this.$electron.ipcRenderer.once('config', (event, data) => {
         if (data.namespace === button.actionNamespace && data.action === button.action) {
-          this.$modal.show(Modal, {
+          this.$modal.show(ConfigModal, {
             inactiveIcon: button.icons.inactive,
             activeIcon: button.icons.active,
             config: button.config,
@@ -148,6 +153,10 @@ export default {
           bottom: 0;
           text-align: center;
           width: 100%;
+        }
+
+        .default-icon {
+          color: #FAFAFA;
         }
       }
     }

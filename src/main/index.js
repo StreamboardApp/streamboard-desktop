@@ -110,7 +110,14 @@ app.on('activate', () => {
   }
 })
 
-ipcMain.on('ready', () => {
+ipcMain.on('ready', (event) => {
+  if (process.env.NODE_ENV === 'production') {
+    event.sender.send('loading', {
+      state: 'UPDATE_CHECK'
+    })
+    autoUpdater.checkForUpdates()
+  }
+
   // Perform initialization if the first run
   if (store.state.application.firstRun) {
     store.dispatch('boards/SET_SAVED', [
@@ -126,14 +133,8 @@ ipcMain.on('ready', () => {
               icons: {
                 inactive: '',
                 active: ''
-              }
-            },
-            {
-              label: '',
-              action: '',
-              actionNamespace: '',
-              config: {},
-              icons: {
+              },
+              defaultIcons: {
                 inactive: '',
                 active: ''
               }
@@ -146,14 +147,8 @@ ipcMain.on('ready', () => {
               icons: {
                 inactive: '',
                 active: ''
-              }
-            },
-            {
-              label: '',
-              action: '',
-              actionNamespace: '',
-              config: {},
-              icons: {
+              },
+              defaultIcons: {
                 inactive: '',
                 active: ''
               }
@@ -164,6 +159,38 @@ ipcMain.on('ready', () => {
               actionNamespace: '',
               config: {},
               icons: {
+                inactive: '',
+                active: ''
+              },
+              defaultIcons: {
+                inactive: '',
+                active: ''
+              }
+            },
+            {
+              label: '',
+              action: '',
+              actionNamespace: '',
+              config: {},
+              icons: {
+                inactive: '',
+                active: ''
+              },
+              defaultIcons: {
+                inactive: '',
+                active: ''
+              }
+            },
+            {
+              label: '',
+              action: '',
+              actionNamespace: '',
+              config: {},
+              icons: {
+                inactive: '',
+                active: ''
+              },
+              defaultIcons: {
                 inactive: '',
                 active: ''
               }
@@ -178,14 +205,8 @@ ipcMain.on('ready', () => {
               icons: {
                 inactive: '',
                 active: ''
-              }
-            },
-            {
-              label: '',
-              action: '',
-              actionNamespace: '',
-              config: {},
-              icons: {
+              },
+              defaultIcons: {
                 inactive: '',
                 active: ''
               }
@@ -198,14 +219,8 @@ ipcMain.on('ready', () => {
               icons: {
                 inactive: '',
                 active: ''
-              }
-            },
-            {
-              label: '',
-              action: '',
-              actionNamespace: '',
-              config: {},
-              icons: {
+              },
+              defaultIcons: {
                 inactive: '',
                 active: ''
               }
@@ -216,6 +231,38 @@ ipcMain.on('ready', () => {
               actionNamespace: '',
               config: {},
               icons: {
+                inactive: '',
+                active: ''
+              },
+              defaultIcons: {
+                inactive: '',
+                active: ''
+              }
+            },
+            {
+              label: '',
+              action: '',
+              actionNamespace: '',
+              config: {},
+              icons: {
+                inactive: '',
+                active: ''
+              },
+              defaultIcons: {
+                inactive: '',
+                active: ''
+              }
+            },
+            {
+              label: '',
+              action: '',
+              actionNamespace: '',
+              config: {},
+              icons: {
+                inactive: '',
+                active: ''
+              },
+              defaultIcons: {
                 inactive: '',
                 active: ''
               }
@@ -230,14 +277,8 @@ ipcMain.on('ready', () => {
               icons: {
                 inactive: '',
                 active: ''
-              }
-            },
-            {
-              label: '',
-              action: '',
-              actionNamespace: '',
-              config: {},
-              icons: {
+              },
+              defaultIcons: {
                 inactive: '',
                 active: ''
               }
@@ -250,14 +291,8 @@ ipcMain.on('ready', () => {
               icons: {
                 inactive: '',
                 active: ''
-              }
-            },
-            {
-              label: '',
-              action: '',
-              actionNamespace: '',
-              config: {},
-              icons: {
+              },
+              defaultIcons: {
                 inactive: '',
                 active: ''
               }
@@ -268,6 +303,38 @@ ipcMain.on('ready', () => {
               actionNamespace: '',
               config: {},
               icons: {
+                inactive: '',
+                active: ''
+              },
+              defaultIcons: {
+                inactive: '',
+                active: ''
+              }
+            },
+            {
+              label: '',
+              action: '',
+              actionNamespace: '',
+              config: {},
+              icons: {
+                inactive: '',
+                active: ''
+              },
+              defaultIcons: {
+                inactive: '',
+                active: ''
+              }
+            },
+            {
+              label: '',
+              action: '',
+              actionNamespace: '',
+              config: {},
+              icons: {
+                inactive: '',
+                active: ''
+              },
+              defaultIcons: {
                 inactive: '',
                 active: ''
               }
@@ -283,16 +350,28 @@ ipcMain.on('ready', () => {
     store.dispatch('application/SET_PLUGINS', [
       {
         type: 'github',
-        package: 'StreamboardApp/streamboard-plugin-streamlabs'
+        package: 'StreamboardApp/streamboard-plugin-streamlabs',
+        name: 'streamboard-plugin-streamlabs'
       }
     ])
   }
 
+  event.sender.send('loading', {
+    state: 'LOADING_PLUGINS'
+  })
   store.state.application.plugins.forEach(async pluginInfo => {
+    event.sender.send('loading', {
+      state: 'LOADING_PLUGIN',
+      data: {
+        name: pluginInfo.name
+      }
+    })
     loadPlugin(pluginInfo)
   })
   
   server.start()
+
+  event.sender.send('ready')
 })
 
 async function loadPlugin(pluginInfo) {
@@ -301,7 +380,10 @@ async function loadPlugin(pluginInfo) {
   switch (pluginInfo.type) {
   case 'local': {
     try {
-      const info = await manager.installFromPath(pluginInfo.package)
+      // Local plugins are not to be used in production and have force set to true to always reload the local cache
+      const info = await manager.installFromPath(pluginInfo.package, {
+        force: true
+      })
       const plugin = manager.require(info.name)
       assert.equal(plugin !== null && typeof plugin === 'object' && !Array.isArray(plugin), true, `Plugin ${info.name} is not an object`)
       assert.equal(typeof plugin.namespace === 'string', true, `Plugin ${info.name} namespace is not a string`)
@@ -377,37 +459,43 @@ ipcMain.on('actions', async (event, message) => {
 })
 
 ipcMain.on('application', async (event, message) => {
-  var plugins
   switch (message.event) {
-  case 'GET_PLUGINS': {
-    plugins = await manager.list()
-    event.sender.send('plugins', {
-      plugins
-    })
-    break
-  }
   case 'ADD_PLUGIN': {
     await loadPlugin({
       type: 'github',
       package: message.data.package
     })
-    plugins = await manager.list()
-    event.sender.send('plugins', {
-      plugins
+    var pluginInfo = await manager.queryPackageFromGithub(message.data.package)
+    var plugins = [...store.state.application.plugins]
+    plugins.push({
+      type: 'github',
+      package: message.data.package,
+      name: pluginInfo.name
     })
+    store.dispatch('application/SET_PLUGINS', plugins)
     break
   }
   case 'REMOVE_PLUGIN': {
     const plugin = manager.require(message.data.name)
     actions.unregisterActions(plugin.namespace)
     await manager.uninstall(message.data.name)
-    plugins = await manager.list()
-    event.sender.send('plugins', {
-      plugins
-    })
     break
   }
   }
+
+  var installedPlugins = await manager.list()
+  var newPluginsList = store.state.application.plugins.filter(plugin => {
+    var contains = false
+    installedPlugins.forEach((installedPlugin) => {
+      if (installedPlugin.name === plugin.name) {
+        contains = true
+      }
+    })
+
+    return contains
+  })
+
+  store.dispatch('application/SET_PLUGINS', newPluginsList)
 })
 
 /**

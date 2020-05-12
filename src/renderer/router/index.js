@@ -11,6 +11,11 @@ export default new Router({
       component: require('@/pages/MainPage').default
     },
     {
+      path: '/loading',
+      name: 'loading-page',
+      component: require('@/pages/LoadingPage').default
+    },
+    {
       path: '*',
       redirect: '/'
     }

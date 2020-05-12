@@ -3,17 +3,14 @@
     <h3>Preferences</h3>
     <vue-tabs ref="tabs">
       <v-tab title="Plugins" class="plugins-tab">
-        <div class="add-plugin-container" v-if="!this.loadingPlugins">
+        <div class="add-plugin-container">
           <input class="add-plugin-input" ref="addPluginInput" type="text" placeholder="Add plugin">
           <button class="add-plugin" @click="addPlugin">Add</button>
         </div>
-        <div v-if="this.loadingPlugins">
-          <p>Loading plugins...</p>
+        <div v-if="this.$store.state.application.plugins.length === 0">
+          <p class="no-plugins">No plugins installed</p>
         </div>
-        <div v-else-if="!this.loadingPlugins && this.plugins.length === 0">
-          <p>No plugins installed</p>
-        </div>
-        <div v-else v-for="(plugin, index) in plugins" v-bind:key="index" class="plugin">
+        <div v-else v-for="(plugin, index) in this.$store.state.application.plugins" v-bind:key="index" class="plugin">
           <p class="plugin-name">{{ plugin.name }} <span class="plugin-version"> {{ plugin.version }}</span></p>
           <button class="remove" @click="removePlugin(plugin)">Remove</button>
         </div>
@@ -31,26 +28,6 @@ export default {
   components: {
     VueTabs,
     VTab
-  },
-  data () {
-    return {
-      plugins: [],
-      loadingPlugins: false
-    }
-  },
-  mounted () {
-    this.plugins = []
-    this.loadingPlugins = true
-
-    this.$electron.ipcRenderer.send('application', {
-      event: 'GET_PLUGINS'
-    })
-
-    this.$electron.ipcRenderer.on('plugins', (_, message) => {
-      if (message.plugins === undefined) { message.plugins = [] }
-      this.plugins = message.plugins
-      this.loadingPlugins = false
-    })
   },
   methods: {
     addPlugin () {
@@ -143,6 +120,11 @@ export default {
                 background-color: #D32F2F;
               }
             }
+          }
+          
+          .no-plugins {
+            padding: 0.75rem;
+            margin: unset;
           }
 
           .add-plugin-container {

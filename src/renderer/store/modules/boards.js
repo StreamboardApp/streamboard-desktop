@@ -10,6 +10,8 @@ const mutations = {
   BUTTON_ACTION (state, data) {
     state.saved[state.active].structure[data.row][data.column].action = data.action
     state.saved[state.active].structure[data.row][data.column].actionNamespace = data.actionNamespace
+    state.saved[state.active].structure[data.row][data.column].defaultIcons.inactive = data.defaultIcons.inactive
+    state.saved[state.active].structure[data.row][data.column].defaultIcons.active = data.defaultIcons.active
   },
   BUTTON_CONFIG (state, data) {
     if (state.saved[state.active].structure[data.row][data.column].config === null || state.saved[state.active].structure[data.row][data.column].config === undefined) {

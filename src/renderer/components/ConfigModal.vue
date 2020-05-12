@@ -25,7 +25,7 @@
 
 <script>
 export default {
-  name: 'modal',
+  name: 'config-modal',
   props: {
     inactiveIcon: String,
     activeIcon: String,
