@@ -12,7 +12,8 @@ export default new Vuex.Store({
   modules,
   plugins: [
     createPersistedState({
-      blacklist: ['application/ACTIONS']
+      blacklist: ['application/ACTIONS'],
+      ignoredPaths: ['application.actions']
     }),
     createSharedMutations(),
     createPromiseAction()

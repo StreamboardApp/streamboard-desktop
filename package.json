@@ -74,7 +74,7 @@
     "vue-nav-tabs": "^0.5.7",
     "vue-router": "^3.1.6",
     "vuex": "^3.3.0",
-    "vuex-electron": "^1.0.3",
+    "vuex-electron": "MaverickMartyn/vuex-electron#e6051fa60eb602d7757d30e5d86f0a7bef8c6885",
     "ws": "^7.2.5"
   },
   "devDependencies": {
