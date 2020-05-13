@@ -1,16 +1,18 @@
 <template>
   <div class="container">
-    <div class="row" v-for="(row, rowIndex) in board.structure" :key="rowIndex">
-      <div class="column" v-for="(column, columnIndex) in row" :key="columnIndex">
-        <button @click="configureButton(rowIndex, columnIndex)" @contextmenu="executeButton(rowIndex, columnIndex)" @dragstart="buttonDragStart($event, rowIndex, columnIndex)" @dragover="buttonDragOver($event)" @dragenter="buttonDragEnter($event, rowIndex, columnIndex)" @dragleave="buttonDragLeave($event)" @drop="buttonDragDrop($event, rowIndex, columnIndex)" :class="{ button: true, active: column.state }" >
-          <img v-if="!column.state && column.icons.inactive.trim() !== ''" class="icon" :src="column.icons.inactive">
-          <img v-if="column.state && column.icons.active.trim() !== ''" class="icon" :src="column.icons.active">
+    <div class="grid">
+      <div class="row" v-for="(row, rowIndex) in board.structure" :key="rowIndex">
+        <div class="column" v-for="(column, columnIndex) in row" :key="columnIndex">
+          <button @click="configureButton(rowIndex, columnIndex)" @contextmenu="executeButton(rowIndex, columnIndex)" @dragstart="buttonDragStart($event, rowIndex, columnIndex)" @dragover="buttonDragOver($event)" @dragenter="buttonDragEnter($event, rowIndex, columnIndex)" @dragleave="buttonDragLeave($event)" @drop="buttonDragDrop($event, rowIndex, columnIndex)" :class="{ button: true, active: column.state }" >
+            <img v-if="!column.state && column.icons.inactive.trim() !== ''" class="icon" :src="column.icons.inactive">
+            <img v-if="column.state && column.icons.active.trim() !== ''" class="icon" :src="column.icons.active">
 
-          <fa-icon class="default-icon" v-if="!column.state && column.icons.inactive.trim() === '' && column.defaultIcons.inactive.trim() !== ''" :icon="column.defaultIcons.inactive.split(' ')" size="6x"></fa-icon>
-          <fa-icon class="default-icon" v-if="column.state && column.icons.active.trim() === '' && column.defaultIcons.active.trim() !== ''" :icon="column.defaultIcons.active.split(' ')" size="6x"></fa-icon>
+            <fa-icon class="default-icon" v-if="!column.state && column.icons.inactive.trim() === '' && column.defaultIcons.inactive.trim() !== ''" :icon="column.defaultIcons.inactive.split(' ')" size="6x"></fa-icon>
+            <fa-icon class="default-icon" v-if="column.state && column.icons.active.trim() === '' && column.defaultIcons.active.trim() !== ''" :icon="column.defaultIcons.active.split(' ')" size="6x"></fa-icon>
 
-          <p class="label">{{ column.label }}</p>
-        </button>
+            <p class="label">{{ column.label }}</p>
+          </button>
+        </div>
       </div>
     </div>
   </div>
@@ -116,51 +118,90 @@ export default {
     display: flex;
     justify-content: center;
     align-items: center;
-    flex-direction: column;
 
-    .row {
-      display: flex;
-      flex-direction: row;
+    .grid {
+      //margin: 0 auto;
+      width: calc(100vw - 4rem);
+      max-width: calc(100vh - 4rem);
+      //height: 80vw;
+      max-height: calc(100vh - 4rem);
 
-      .button {
-        width: 128px;
-        height: 128px;
-        margin: 0.75rem;
-        outline: unset;
-        padding: unset;
-        background: unset;
-        border: 1px solid #FAFAFA;
-        border-radius: 1rem;
-        position: relative;
+      .row {
+        display: flex;
 
-        .icon {
-          width: 100%;
-          height: 100%;
-          border-radius: 1rem;
-        }
+        .column {
+          margin: 5px;
+          color: white;
+          font-weight: bold;
+          flex: 1 0 auto;
+          position: relative;
 
-        &.active {
-          background-color: #FAFAFA;
-          
-          .default-icon {
-            color: #000000;
+          &:after {
+            content: "";
+            float: left;
+            display: block;
+            padding-top: 100%;
+          }
+
+          .button {
+            position: absolute;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            top: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            outline: unset;
+            padding: unset;
+            background: unset;
+            border: 1px solid #FAFAFA;
+            border-radius: 16px;
+
+            .icon {
+              width: 100%;
+              height: 100%;
+              border-radius: 16px;
+            }
+
+            &.active {
+              background-color: #FAFAFA;
+              
+              .default-icon {
+                color: #000000;
+              }
+            }
+
+            &:hover, &.hover {
+              cursor: pointer;
+              transform: scale(1.1);
+            }
+
+            .label {
+              position: absolute;
+              bottom: 0;
+              text-align: center;
+              width: 100%;
+            }
+
+            .default-icon {
+              color: #FAFAFA;
+            }
           }
         }
 
-        &:hover, &.hover {
-          cursor: pointer;
-          transform: scale(1.1);
-        }
+        .column {
+          margin: 0.75rem;
+          flex: 1 0 auto;
+          position: relative;
 
-        .label {
-          position: absolute;
-          bottom: 0;
-          text-align: center;
-          width: 100%;
-        }
-
-        .default-icon {
-          color: #FAFAFA;
+          &:after {
+            content: "";
+            float: left;
+            display: block;
+            padding-top: 100%;
+          }
         }
       }
     }
