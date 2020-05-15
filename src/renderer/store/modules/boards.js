@@ -32,6 +32,18 @@ const mutations = {
 
     state.saved[state.active].structure[data.source.row][data.source.column] = destination
     state.saved[state.active].structure[data.destination.row][data.destination.column] = source
+  },
+  BOARD_ACTIVE (state, data) {
+    state.active = data
+  },
+  ADD_BOARD (state, data) {
+    state.saved.push(data)
+  },
+  DELETE_BOARD (state, data) {
+    // Disallow deleting all boards
+    if (state.saved.length > 1) {
+      state.saved.splice(data, 1)
+    }
   }
 }
 
@@ -53,6 +65,15 @@ const actions = {
   },
   SWAP_BUTTONS ({ commit }, data) {
     commit('SWAP_BUTTONS', data)
+  },
+  SET_BOARD_ACTIVE ({ commit }, data) {
+    commit('BOARD_ACTIVE', data)
+  },
+  ADD_BOARD ({ commit }, data) {
+    commit ('ADD_BOARD', data)
+  },
+  DELETE_BOARD ({ commit }, data) {
+    commit ('DELETE_BOARD', data)
   }
 }
 
