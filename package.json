@@ -59,7 +59,7 @@
     "@fortawesome/free-regular-svg-icons": "^5.13.0",
     "@fortawesome/free-solid-svg-icons": "^5.13.0",
     "@fortawesome/vue-fontawesome": "^0.1.9",
-    "axios": "^0.18.0",
+    "axios": "^0.21.1",
     "babel-helper-vue-jsx-merge-props": "^2.0.3",
     "custom-electron-titlebar": "^3.2.2-hotfix62",
     "electron-promise-ipc": "^2.1.0",
