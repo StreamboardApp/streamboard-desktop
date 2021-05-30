@@ -76,7 +76,7 @@
     "vuedraggable": "^2.23.2",
     "vuex": "^3.3.0",
     "vuex-electron": "MaverickMartyn/vuex-electron#e6051fa60eb602d7757d30e5d86f0a7bef8c6885",
-    "ws": "^7.2.5"
+    "ws": "^7.4.6"
   },
   "devDependencies": {
     "@babel/core": "^7.9.6",
